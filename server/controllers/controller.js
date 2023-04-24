@@ -1,10 +1,10 @@
 const ItemModel = require("../models/Item");
 
 module.exports.getItems = async (req, res) => {
-  // const items = await ItemModel.find()
-  // res.send(items);
+  const items = await ItemModel.find();
+  res.send(items);
 
-  res.send("hello");
+  //   res.send("hello");
 };
 
 module.exports.postItems = (req, res) => {
@@ -19,10 +19,36 @@ module.exports.postItems = (req, res) => {
     .save()
     .then((item) => {
       console.log(`Saved item: ${item}`);
+      res.send(item);
     })
     .catch((err) => {
       console.log(`Error saving item: ${err}`);
     });
+};
 
-  res.send(item);
+module.exports.updateItems = async (req, res) => {
+  const { id } = req.params;
+  const { item } = req.body;
+  const update = new ItemModel({
+    itemName: item.itemName,
+    quantity: item.quantity,
+  });
+  const doc = await ItemModel.findOneAndUpdate(
+    { _id: id },
+    {
+      $set: {
+        itemName: update.itemName,
+        quantity: update.quantity,
+      },
+    }
+  ).exec();
+  console.log(doc);
+  res.send(doc);
+};
+
+module.exports.deleteItems = async (req, res) => {
+  const { id } = req.params;
+  const doc = await ItemModel.findOneAndDelete({ _id: id }).exec();
+  console.log(`Delete Successfully`);
+  res.send("done");
 };
